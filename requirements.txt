@@ -1,0 +1,5 @@
+numpy>=2.0
+pandas>=2.2
+matplotlib>=3.9
+mplsoccer==1.4.0
+torch>=2.2

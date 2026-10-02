@@ -1,0 +1,239 @@
+{
+ "data": "760 Premier League matches, 2024/25 and 2025/26 (tracking and event data; not released)",
+ "low_block_share_of_possession_time_pct": {
+  "all": [
+   14.3,
+   13.0,
+   15.6
+  ],
+  "strongest_third_of_teams": [
+   17.4,
+   14.9,
+   19.6
+  ],
+  "weakest_third_of_teams": [
+   12.2,
+   11.2,
+   13.5
+  ]
+ },
+ "low_block_share_trend_2021_22_to_2025_26_pct_points": [
+  1.36,
+  -1.43,
+  3.97
+ ],
+ "choice_model_cross_auc_held_out_season": {
+  "gat": [
+   0.792,
+   0.784,
+   0.8
+  ],
+  "ball_position_only": [
+   0.685,
+   0.675,
+   0.694
+  ]
+ },
+ "table_1_wide_decision": {
+  "units": "per 100 five-second wide decisions, against recycling; point estimate, 95% match-clustered interval",
+  "recycle (reference)": {
+   "share": 57.4,
+   "where_lost_m_from_own_goal": [
+    91.4,
+    90.6,
+    92.2
+   ]
+  },
+  "pass or carry into the block": {
+   "share": 33.1,
+   "extra_balls_lost_5s": [
+    4.2,
+    3.5,
+    4.8
+   ],
+   "where_lost_m_from_own_goal": [
+    91.1,
+    90.1,
+    92.0
+   ],
+   "counter_xg_20s": [
+    -0.04,
+    -0.1,
+    0.02
+   ],
+   "xg_created_rest_of_attack": [
+    0.28,
+    0.11,
+    0.44
+   ],
+   "net_xg": [
+    0.32,
+    0.14,
+    0.49
+   ]
+  },
+  "cross": {
+   "share": 9.5,
+   "extra_balls_lost_5s": [
+    17.4,
+    15.9,
+    19.0
+   ],
+   "where_lost_m_from_own_goal": [
+    97.8,
+    97.5,
+    98.2
+   ],
+   "counter_xg_20s": [
+    -0.03,
+    -0.11,
+    0.05
+   ],
+   "xg_created_rest_of_attack": [
+    0.85,
+    0.54,
+    1.18
+   ],
+   "net_xg": [
+    0.87,
+    0.56,
+    1.22
+   ]
+  },
+  "lofted cross": {
+   "share": 7.6,
+   "extra_balls_lost_5s": [
+    17.6,
+    16.0,
+    19.2
+   ],
+   "where_lost_m_from_own_goal": [
+    98.1,
+    97.7,
+    98.7
+   ],
+   "counter_xg_20s": [
+    -0.03,
+    -0.12,
+    0.05
+   ],
+   "xg_created_rest_of_attack": [
+    0.74,
+    0.43,
+    1.07
+   ],
+   "net_xg": [
+    0.77,
+    0.46,
+    1.13
+   ]
+  },
+  "low cross": {
+   "share": 1.4,
+   "extra_balls_lost_5s": [
+    10.4,
+    6.6,
+    14.2
+   ],
+   "where_lost_m_from_own_goal": [
+    96.8,
+    96.1,
+    97.6
+   ],
+   "counter_xg_20s": [
+    -0.01,
+    -0.18,
+    0.18
+   ],
+   "xg_created_rest_of_attack": [
+    1.24,
+    0.29,
+    2.39
+   ],
+   "net_xg": [
+    1.25,
+    0.28,
+    2.38
+   ]
+  }
+ },
+ "figure_1b_each_option_vs_not_taking_it": {
+  "pass into the block": {
+   "risk_turnover_odds_ratio": [
+    1.63,
+    1.568,
+    1.694
+   ],
+   "reward_net_xg_ratio": [
+    1.169,
+    1.101,
+    1.238
+   ]
+  },
+  "carry into the block": {
+   "risk_turnover_odds_ratio": [
+    1.45,
+    1.369,
+    1.536
+   ],
+   "reward_net_xg_ratio": [
+    1.158,
+    1.066,
+    1.251
+   ]
+  },
+  "switch": {
+   "risk_turnover_odds_ratio": [
+    1.268,
+    1.224,
+    1.313
+   ],
+   "reward_net_xg_ratio": [
+    1.075,
+    1.02,
+    1.131
+   ]
+  },
+  "extra attacker near the ball": {
+   "risk_turnover_odds_ratio": [
+    0.337,
+    0.322,
+    0.352
+   ],
+   "reward_net_xg_ratio": [
+    0.884,
+    0.841,
+    0.927
+   ]
+  },
+  "lofted cross": {
+   "risk_turnover_odds_ratio": [
+    2.923,
+    2.74,
+    3.119
+   ],
+   "reward_net_xg_ratio": [
+    1.465,
+    1.305,
+    1.624
+   ]
+  },
+  "low cross": {
+   "risk_turnover_odds_ratio": [
+    2.351,
+    2.102,
+    2.629
+   ],
+   "reward_net_xg_ratio": [
+    1.645,
+    1.371,
+    1.918
+   ]
+  }
+ },
+ "shot_rate_attacks_alive_after_40s_vs_first_5s_adjusted_for_ball_position_and_team": [
+  0.99,
+  0.89,
+  1.1
+ ]
+}
