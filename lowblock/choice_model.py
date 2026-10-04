@@ -6,7 +6,7 @@ into the block, cross). Its predicted probabilities are the propensities used by
 lowblock/aipw.py.
 
 Node order: 11 attackers (goalkeeper first), 11 defenders (goalkeeper first), then the ball. Coordinates are metres
-in the attacking direction: depth from the attacked goal and lateral position from the centre line. Missing players
+in the attacking direction: depth from the goal line being attacked and lateral position from the centre line. Missing players
 are masked.
 
 Training: cross-entropy, trained on one season and evaluated on the other (and vice versa), so every prediction is
@@ -98,3 +98,78 @@ class ChoiceModel(nn.Module):
 
     def forward(self, x, m, context):
         return self.head(torch.cat([self.encoder(x, m), context], -1))
+
+
+def validation_matches(match_ids, season, train_season, seed=7071):
+    """The 15% of the training season's matches held back for early stopping."""
+    import numpy as np
+
+    um = np.sort(np.unique(match_ids[season == train_season]))
+    return set(np.random.default_rng(seed).choice(um, max(1, int(round(0.15 * len(um)))), replace=False).tolist())
+
+
+def train_season_swap(W, M, ctx, A, season, match_ids, train_season, seed=7071, epochs=25, minutes=12.0,
+                      batch_size=256, device="cpu", log=print):
+    """Train on `train_season` (15% of its matches held back for early stopping) and return probabilities [n, 3] for
+    the rows of the other season (NaN elsewhere) plus a training summary."""
+    import time
+
+    import numpy as np
+
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    itr_all = np.where(season == train_season)[0]
+    ite = np.where(season != train_season)[0]
+    va_m = validation_matches(match_ids, season, train_season, seed)
+    is_va = np.isin(match_ids, list(va_m))
+    itr, iva = itr_all[~is_va[itr_all]], itr_all[is_va[itr_all]]
+    mu, sd = np.nanmean(ctx[itr], 0), np.nanstd(ctx[itr], 0) + 1e-6
+    c = np.nan_to_num((ctx - mu) / sd, nan=0.0).astype(np.float32)
+    dev = torch.device(device)
+    Wd, Md = torch.from_numpy(W).to(dev), torch.from_numpy(M).to(dev)
+    Cd, Yd = torch.from_numpy(c).to(dev), torch.from_numpy(A.astype(np.int64)).to(dev)
+    net = ChoiceModel().to(dev)
+    opt = torch.optim.AdamW(net.parameters(), lr=1e-3, weight_decay=0.01)
+
+    def batches(idx, shuffle):
+        o = np.random.permutation(idx) if shuffle else idx
+        for i in range(0, len(o), batch_size):
+            yield torch.from_numpy(np.sort(o[i:i + batch_size])).to(dev)
+
+    def predict(idx):
+        net.eval()
+        out = []
+        with torch.no_grad():
+            for j in batches(idx, False):
+                out.append(torch.softmax(net(Wd[j].float(), Md[j], Cd[j]), -1).float().cpu().numpy())
+        return np.concatenate(out)
+
+    best, bad, best_state, t0, hist = np.inf, 0, None, time.time(), []
+    for ep in range(epochs):
+        te = time.time()
+        net.train()
+        tot, n = 0.0, 0
+        for j in batches(itr, True):
+            loss = F.cross_entropy(net(Wd[j].float(), Md[j], Cd[j]), Yd[j])
+            opt.zero_grad()
+            loss.backward()
+            nn.utils.clip_grad_norm_(net.parameters(), 1.0)
+            opt.step()
+            tot += float(loss.detach()) * len(j)
+            n += len(j)
+        Pv = predict(iva)
+        lv = float(-np.mean(np.log(np.clip(Pv[np.arange(len(iva)), A[iva]], 1e-12, 1))))
+        hist.append({"epoch": ep + 1, "train_logloss": tot / max(n, 1), "val_logloss": lv})
+        log(f"[train {train_season}] epoch {ep + 1}: train log loss {tot / max(n, 1):.4f} | val log loss {lv:.4f}")
+        if lv < best - 1e-4:
+            best, bad = lv, 0
+            best_state = {k: v.detach().clone() for k, v in net.state_dict().items()}
+        else:
+            bad += 1
+        if bad >= 3 or (time.time() - t0) / 60 + (time.time() - te) / 60 > minutes:
+            break
+    net.load_state_dict(best_state)
+    P = np.full((len(A), 3), np.nan)
+    P[ite] = predict(ite)
+    return P, {"train_season": train_season, "n_train": int(len(itr)), "n_val": int(len(iva)), "n_test": int(len(ite)),
+               "epochs": hist, "best_val_logloss": best, "val_matches": sorted(int(x) for x in va_m)}

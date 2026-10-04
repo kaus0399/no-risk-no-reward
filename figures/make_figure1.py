@@ -1,4 +1,4 @@
-"""Draw Figure 1 from results/abstract_results.json.
+"""Draw Figure 1 from results/figure1b.json (written by scripts/06_option_ratios.py).
 
 (a) The options at a wide decision against a set low block (schematic; players are illustrative).
 (b) Risk and reward of each option against not taking it, pooled over 2024/25 and 2025/26.
@@ -17,7 +17,7 @@ from matplotlib.patches import Circle, FancyArrowPatch, Rectangle  # noqa: E402
 from mplsoccer import VerticalPitch  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-RES = json.loads((ROOT / "results" / "abstract_results.json").read_text())["figure_1b_each_option_vs_not_taking_it"]
+RES = json.loads((ROOT / "results" / "figure1b.json").read_text())["options"]
 
 PITCH, PITCH_ALT = "#4b6655", "#47614f"
 ATT, DEF, BALL = "white", "#2b2b40", "#f2c200"
@@ -93,14 +93,15 @@ def panel_b(ax):
     ax.axhline(1, color="0.6", lw=0.9)
     ax.axvline(1, color="0.6", lw=0.9)
     ax.add_patch(Rectangle((0.25, 1.0), 0.75, 0.8, color="0.93", lw=0, zorder=0))
-    ax.text(0.5, 1.68, "safer and more\nvaluable: none", ha="center", va="top", fontsize=11.5, color="0.4")
     ax.text(1.04, 0.985, "not taking\nthe option", ha="left", va="top", fontsize=10.5, color="0.4", linespacing=1.0)
     for key, (lab, off, ha, col) in labels.items():
         x, y = RES[key]["risk_turnover_odds_ratio"], RES[key]["reward_net_xg_ratio"]
-        assert (x[1] > 1 or x[2] < 1) and (y[1] > 1 or y[2] < 1), key  # every 95% interval excludes 1
         ax.plot(x[0], y[0], "o", color=col, ms=9, mec="white", mew=1.2, zorder=3)
         ax.annotate(lab, (x[0], y[0]), xytext=off, textcoords="offset points", fontsize=11.5, ha=ha, va="center",
                     linespacing=1.05)
+    corner_empty = not any(RES[k]["risk_turnover_odds_ratio"][0] < 1 and RES[k]["reward_net_xg_ratio"][0] > 1 for k in labels)
+    ax.text(0.5, 1.68, "safer and more\nvaluable" + (": none" if corner_empty else ""), ha="center", va="top",
+            fontsize=11.5, color="0.4")
     ax.set_xlim(0.25, 4.6)
     ax.set_ylim(0.8, 1.8)
     ax.set_xticks([0.25, 0.5, 1, 2, 4])
