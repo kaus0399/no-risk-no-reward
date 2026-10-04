@@ -25,7 +25,7 @@ With Python 3.12:
 pip install -r requirements.txt
 ```
 
-The pipeline runs in seven steps. `DATA` is the folder with your match data (see [Input data](#input-data)); it can also be set with the `LOWBLOCK_DATA_ROOT` environment variable. Intermediate tables go to the folder given by `--out`, and the reported numbers to `results/`.
+The pipeline runs in seven steps. `DATA` is the folder with your match data (see [Data](#data)); it can also be set with the `LOWBLOCK_DATA_ROOT` environment variable. Intermediate tables go to the folder given by `--out`, and the reported numbers to `results/`.
 
 | Step | Command | Output |
 |---|---|---|
@@ -47,11 +47,9 @@ python figures/make_figure1.py
 
 ## Data
 
-We used tracking and event data from 760 Premier League matches (2024/25 and 2025/26). These data are proprietary and cannot be released. The pipeline runs on other tracking and event data prepared in the format described below, and the aggregate results we report are included in `results/`.
+The code expects tracking data with the fields of [kloppy](https://kloppy.pysport.org)'s tracking model and event data with the core fields of [SPADL](https://socceraction.readthedocs.io/en/latest/documentation/spadl/spadl.html) (Decroos et al., 2019), plus possession number, pass height and shot xG.
 
-### Input data
-
-The code needs tracking data with the positions of all players and the ball (25 frames per second, in metres), and event data with possessions, passes, crosses and shot xG. Team and player ids must match across the two. Each match sits in its own folder:
+The 760 Premier League matches (2024/25 and 2025/26) behind our results are proprietary and cannot be released. The pipeline can be applied to any other dataset prepared in the same format, with each match in its own folder:
 
 ```
 DATA/<season>/<match>/
@@ -60,7 +58,7 @@ DATA/<season>/<match>/
     events/events.csv
 ```
 
-Season folders are named like `20242025`, and the seasons used are set in `lowblock/config.py`. The expected fields, units and values are listed in `lowblock/schema.py`. Data with different column names can be used by passing a mapping file with `--schema` (format in the same file). Event times are aligned with the tracking clock automatically, one offset per period.
+Season folders are named like `20242025`, and the seasons used are set in `lowblock/config.py`. Team and player ids must match across tracking and events. Fields, units and accepted values are listed in `lowblock/schema.py`, and a mapping file passed with `--schema` adapts other column names. Event times are aligned with the tracking clock automatically. The aggregate results we report are in `results/`.
 
 ## Pipeline in detail
 
